@@ -1,0 +1,22 @@
+version: "3.3"
+services:
+  web:
+    container_name: flask_blog
+    build: .
+    ports: 
+      - "5000:5000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - "/flask_blog:/app"
+    depends_on:
+      - db
+  db:
+    container_name: db
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=nathan
+      - POSTGRES_DB=flask_blog
+    ports:
+      - "5432:5432"

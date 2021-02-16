@@ -3,19 +3,20 @@ from flask import (
         )
 from werkzeug.exceptions import abort
 from flask_blog.auth import login_required
-from flask_blog.db import get_db
-from flask_blog.utils.db_utils import get_post
+from flask_blog.db import get_db, get_post
 
 bp = Blueprint('blog', __name__)
 
 @bp.route('/')
 def index():
     db = get_db()
-    posts = db.execute(
-            'SELECT p.id, title, body, created, author_id, username'
-            ' FROM post p JOIN user u ON p.author_id = u.id'
-            ' ORDER BY created DESC'
-            ).fetchall()
+    cur = db.cursor()
+    query = cur.execute(
+            'SELECT post.id, post.title, post.body, post.created, post.author_id, users.username'
+            ' FROM post JOIN users ON post.author_id = users.id'
+            ' ORDER BY created DESC;'
+            )
+    posts = cur.fetchall()
     return render_template('blog/index.html', posts=posts)
 
 @bp.route('/create', methods=('GET', 'POST'))
@@ -33,10 +34,11 @@ def create():
             flash(error)
         else:
             db = get_db()
-            db.execute(
+            cur = db.cursor()
+            cur.execute(
                     'INSERT INTO post (title, body, author_id)'
-                    ' VALUES (?, ?, ?)',
-                    (title, body, g.user['id'])
+                    ' VALUES (%s, %s, %s)',
+                    (title, body, g.user[0])
                     )
             db.commit()
             return redirect(url_for('blog.index'))
@@ -60,9 +62,10 @@ def update(id):
             flash(error)
         else:
             db = get_db()
-            db.execute(
-                    'UPDATE post SET title = ?, body = ?'
-                    ' WHERE id = ?',
+            cur = db.cursor()
+            cur.execute(
+                    'UPDATE post SET title = %s, body = %s'
+                    ' WHERE id = %s',
                     (title, body, id)
                     )
             db.commit()
@@ -74,6 +77,7 @@ def update(id):
 def delete_id(id):
     get_post(id)
     db = get_db()
-    db.execute('DELETE FROM post WHERE id = ?', (id,))
+    cur = db.cursor()
+    cur.execute('DELETE FROM post WHERE id = %s', (id,))
     db.commit()
     return redirect(url_for('blog.index'))

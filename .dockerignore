@@ -1,0 +1,11 @@
+tests
+setup.py
+MANIFEST.in
+instance
+*.egg-info
+docker-compose.yml
+.git*
+.coverage
+Dockerfile
+.python-version
+.pytest_cache
