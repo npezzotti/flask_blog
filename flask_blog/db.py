@@ -7,12 +7,18 @@ from flask.cli import with_appcontext
 def get_db():
     print("Calling get_db...")
     if 'db' not in g:
-        #g.db = sqlite3.connect(
-         #       current_app.config['DATABASE'],
-          #      detect_types=sqlite3.PARSE_DECLTYPES
-           #     )
-        #g.db.row_factory = sqlite3.Row
-        g.db = psycopg2.connect(host="db",database="flask_blog", user="nathan", password='password')
+        print(current_app.config)
+        try: 
+            g.db = psycopg2.connect(
+                host=current_app.config['DB_HOST'], 
+                database=current_app.config['DB'], 
+                user=current_app.config['DB_USERNAME'], 
+                password=current_app.config['DB_PASSWORD']
+                )
+            print("Connected to database!")
+        except psycopg2.Error as e:
+            print("Unable to connect to database: ", e)
+
     return g.db
 
 def close_db(e=None):

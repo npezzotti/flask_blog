@@ -1,7 +1,10 @@
 class Config(object):
     DEBUG = False
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = 'postgresql://nathan:password@db/flask_blog'
+    DB_HOST = 'db'
+    DB = 'flask_blog'
+    DB_USERNAME = 'nathan'
+    DB_PASSWORD = 'password'
 
 class ProductionConfig(Config):
     pass
