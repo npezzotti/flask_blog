@@ -9,17 +9,11 @@ def create_app(test_config=None):
     app.config.from_mapping(
             SECRET_KEY = 'dev',
             )
-    
-    if test_config is None:
-        app.config.from_pyfile('config.py', silent=True)
-    else: 
+
+    if test_config:
         app.config.from_mapping(test_config)
-
-    try:
-        os.makedirs(app.instance_path)
-    except OSError as e:
-        pass 
-
+    else:
+        app.config.from_pyfile('config.cfg')
     from . import db
     db.init_app(app)
 
