@@ -1,18 +1,19 @@
 print("Calling init")
 import os
 from flask import Flask
+from config import Config
 
-def create_app(test_config=None):
+version_info = (1, 0, 0)
+__version__ = ".".join([str(v) for v in version_info])
+
+def create_app(config=None):
     print("Calling create_app in __init__.py...")
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-            SECRET_KEY = 'dev',
-            )
-
-    if test_config:
-        app.config.from_mapping(test_config)
+    if config is None:
+        app.config.from_object(Config)
     else:
-        app.config.from_pyfile('config.py')
+        app.config.from_mapping(config)
+    print('config: ', app.config)
     from . import db
     db.init_app(app)
 

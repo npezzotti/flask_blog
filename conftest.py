@@ -5,7 +5,7 @@ import pytest
 from flask_blog import create_app
 from flask_blog.db import get_db, init_db
 
-with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
+with open(os.path.join(os.path.dirname(__file__), 'tests/data.sql'), 'rb') as f:
         _data_sql = f.read().decode('utf8')
         print("Created data.sql...\n")
 
@@ -13,7 +13,10 @@ with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
 def app():
     print("\nCalling app fixture...\n")
     db_fd, db_path = tempfile.mkstemp()
-    app = create_app(test_config={'TESTING': True, 'DATABASE': db_path})
+    app = create_app({
+        'TESTING': True,
+        'DATABASE': db_path,
+    })
 
     with app.app_context():
         init_db()

@@ -18,5 +18,3 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=nathan
       - POSTGRES_DB=flask_blog
-    ports:
-      - "5432:5432"
