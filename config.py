@@ -6,6 +6,9 @@ class Config:
     DB = 'flask_blog'
     DB_USERNAME = 'nathan'
     DB_PASSWORD = 'password'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://nathan:password@db/flask_blog'
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+
 
 class DevelopmentConfig(Config):
     """Configurations for development"""

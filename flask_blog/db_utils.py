@@ -1,4 +1,3 @@
-#import sqlite3
 import psycopg2
 import click
 from flask import current_app, g
