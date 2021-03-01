@@ -1,10 +1,11 @@
-tests
 setup.py
 MANIFEST.in
 *.egg-info
 docker-compose.yml
 .git*
-.coverage
 Dockerfile
+__pycache__
 .python-version
 .pytest_cache
+venv
+

@@ -1,31 +1,30 @@
 import os
-import tempfile
-
+import datetime
 import pytest
-from flask_blog import create_app
-from flask_blog.db import get_db, init_db
-
-with open(os.path.join(os.path.dirname(__file__), 'tests/data.sql'), 'rb') as f:
-        _data_sql = f.read().decode('utf8')
-        print("Created data.sql...\n")
+from werkzeug.security import generate_password_hash
+from flask_blog import create_app, db
+from flask_blog.models import User, Post
 
 @pytest.fixture
 def app():
     print("\nCalling app fixture...\n")
-    db_fd, db_path = tempfile.mkstemp()
     app = create_app({
         'TESTING': True,
-        'DATABASE': db_path,
     })
 
     with app.app_context():
-        init_db()
-        get_db().executescript(_data_sql)
+        db.drop_all()
+        db.create_all()
+        db.session.add_all(
+            (            
+                User(username='test', password=generate_password_hash('password')),
+                User(username='other', password=generate_password_hash('password')),
+                Post(title='test title', body='test\nbody', author_id=1, created=datetime.date(2021, 2, 28))
+            )
+        )
+        db.session.commit()
     
     yield app
-
-    os.close(db_fd)
-    os.unlink(db_path)
 
 @pytest.fixture
 def client(app):
@@ -42,7 +41,7 @@ class AuthActions(object):
         print("In the AuthActions class...")
         self._client = client
     
-    def login(self, username='test', password='test'):
+    def login(self, username='test', password='password'):
         return self._client.post(
                 '/auth/login',
                 data={'username': username, 'password': password}
