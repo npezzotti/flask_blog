@@ -1,7 +1,6 @@
 import os
 import datetime
 import pytest
-from werkzeug.security import generate_password_hash
 from flask_blog import create_app, db
 from flask_blog.models import User, Post
 
@@ -15,10 +14,12 @@ def app():
     with app.app_context():
         db.drop_all()
         db.create_all()
+        user1 = User(username='test', password='password')
+        user2 = User(username='other', password='password')
         db.session.add_all(
             (            
-                User(username='test', password=generate_password_hash('password')),
-                User(username='other', password=generate_password_hash('password')),
+                user1,
+                user2,
                 Post(title='test title', body='test\nbody', author_id=1, created=datetime.date(2021, 2, 28))
             )
         )
