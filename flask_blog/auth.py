@@ -28,7 +28,7 @@ def register():
             error = f"User {username} is already registered."        
         
         if error is None:
-            db.session.add(User(username=username, password=generate_password_hash(password)))
+            db.session.add(User(username=username, password=password))
             db.session.commit()
             return redirect(url_for('auth.login'))
         flash(error)
@@ -47,7 +47,7 @@ def login():
         error = None
         if user is None:
             error = "Incorrect username."
-        elif not check_password_hash(user.password, password):
+        elif not user.check_password(password):
             error = "Incorrect password."
         
         print('login error: ', error)
