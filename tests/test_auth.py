@@ -1,6 +1,7 @@
 import pytest
 from flask import g, session
-from flask_blog.db import get_db
+from flask_blog import db
+from flask_blog.models import User
 
 def test_register(client, app):
     print("Calling test_register...")
@@ -8,14 +9,10 @@ def test_register(client, app):
     response = client.post(
             '/auth/register', data={'username': 'a', 'password': 'a'}
             )
-    print(response.headers)
-    assert 'http://localhost/auth/login' == response.headers['location']
+    assert 'http://localhost/auth/login' == response.headers['Location']
 
     with app.app_context():
-        print(get_db().execute("select * from user where username = 'a'").fetchone())
-        assert get_db().execute(
-                "select * from user where username = 'a'",
-                ).fetchone() is not None
+        assert User.query.filter_by(username='a').first() is not None
 
 @pytest.mark.parametrize(('username', 'password', 'message'), (
     ('','', b'Username is required.'),
@@ -28,23 +25,19 @@ def test_register_validate_input(client, username, password, message):
             '/auth/register',
             data={'username': username, 'password': password}
             )
-    print(response.data)
     assert message in response.data
 
 def test_login(client, auth):
     print("Calling test_login...")
     assert client.get('/auth/login').status_code == 200
-    print(client.get('/auth/login').status_code)
     response = auth.login()
-    print(response.headers)
+    print(response.location)
     assert response.headers['Location'] == 'http://localhost/'
 
     with client:
         client.get('/')
-        print(session)
         assert session['user_id'] == 1
-        print(dict(g.user))
-        assert g.user['username'] == 'test'
+        assert g.user.username == 'test'
 
 @pytest.mark.parametrize(('username', 'password', 'message'), (
     ('a', 'test', b'Incorrect username.'),
@@ -53,7 +46,6 @@ def test_login(client, auth):
 def test_login_validate_input(auth, username, password, message):
     print("Calling test_login_validate_input with args: ", username, password, message)
     response = auth.login(username, password)
-    print(response.data)
     assert message in response.data
 
 def test_logout(client, auth):
@@ -62,5 +54,4 @@ def test_logout(client, auth):
 
     with client:
         auth.logout()
-        print(dict(session))
         assert 'user_id' not in session

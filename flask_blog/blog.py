@@ -3,21 +3,14 @@ from flask import (
         )
 from werkzeug.exceptions import abort
 from flask_blog.auth import login_required
-from flask_blog.db_utils import get_db, get_post
+# from flask_blog.db_utils import get_db, get_post
 from flask_blog.models import Post
+from flask_blog import db
 
 bp = Blueprint('blog', __name__)
 
 @bp.route('/')
 def index():
-    # db = get_db()
-    # cur = db.cursor()
-    # query = cur.execute(
-    #         'SELECT post.id, post.title, post.body, post.created, post.author_id, users.username'
-    #         ' FROM post JOIN users ON post.author_id = users.id'
-    #         ' ORDER BY created DESC;'
-    #         )
-    # posts = cur.fetchall()
     posts = Post.query.order_by(Post.created.desc()).all()
     return render_template('blog/index.html', posts=posts)
 
@@ -35,14 +28,9 @@ def create():
         if error is not None:
             flash(error)
         else:
-            db = get_db()
-            cur = db.cursor()
-            cur.execute(
-                    'INSERT INTO post (title, body, author_id)'
-                    ' VALUES (%s, %s, %s)',
-                    (title, body, g.user[0])
-                    )
-            db.commit()
+            post = Post(title=title, body=body, author_id=g.user.id)
+            db.session.add(post)
+            db.session.commit()
             return redirect(url_for('blog.index'))
     
     return render_template('blog/create.html')
@@ -63,23 +51,25 @@ def update(id):
         if error is not None:
             flash(error)
         else:
-            db = get_db()
-            cur = db.cursor()
-            cur.execute(
-                    'UPDATE post SET title = %s, body = %s'
-                    ' WHERE id = %s',
-                    (title, body, id)
-                    )
-            db.commit()
+            post.title = title
+            post.body = body
+            db.session.commit()
             return redirect(url_for('blog.index'))
     return render_template('blog/update.html', post=post)
 
 @bp.route('/<int:id>/delete', methods=('POST',))
 @login_required
 def delete_id(id):
-    get_post(id)
-    db = get_db()
-    cur = db.cursor()
-    cur.execute('DELETE FROM post WHERE id = %s', (id,))
-    db.commit()
+    post = get_post(id)
+    db.session.delete(post)
+    db.session.commit()
     return redirect(url_for('blog.index'))
+
+def get_post(id, check_author=True):
+    post = Post.query.filter_by(id=id).first()
+    if post is None:
+        abort(404, "Post id {} does not exist").format(id)
+    if check_author and post.author_id != g.user.id:
+        abort(403, "You are not authorized to do this.")
+
+    return post
