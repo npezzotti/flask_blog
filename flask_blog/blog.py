@@ -3,7 +3,6 @@ from flask import (
         )
 from werkzeug.exceptions import abort
 from flask_blog.auth import login_required
-# from flask_blog.db_utils import get_db, get_post
 from flask_blog.models import Post
 from flask_blog import db
 
