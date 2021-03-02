@@ -25,7 +25,8 @@ class Post(db.Model):
     author_id = db.Column(db.ForeignKey(User.id), nullable=False)
     title = db.Column(db.String(30), unique=True, nullable=False, server_default='Untitled')
     author = db.relationship(User, lazy=True, backref='post')
-    created = db.Column(db.DateTime, nullable=False, server_default=datetime.utcnow)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    last_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
     body = db.Column(db.Text, nullable=False)
 
     def __repr__(self):
