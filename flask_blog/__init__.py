@@ -40,11 +40,11 @@ def create_app(test_config=None):
     from flask_blog.cli import init_db_command
     app.cli.add_command(init_db_command)
 
-    from . import auth
-    app.register_blueprint(auth.bp)
+    from flask_blog.auth.views import bp as auth_bp
+    app.register_blueprint(auth_bp)
 
-    from . import blog
-    app.register_blueprint(blog.bp)
+    from flask_blog.blog.views import bp as blog_bp
+    app.register_blueprint(blog_bp)
     app.add_url_rule('/', endpoint='index')
 
     return app
