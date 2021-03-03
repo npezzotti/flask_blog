@@ -1,6 +1,6 @@
 import pytest
 from flask_blog import db
-from flask_blog.models import Post
+from flask_blog.blog.models import Post
 
 def test_index(client, auth):
     print("Running test_index...")

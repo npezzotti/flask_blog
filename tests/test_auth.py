@@ -1,7 +1,7 @@
 import pytest
 from flask import g, session
 from flask_blog import db
-from flask_blog.models import User
+from flask_blog.auth.models import User
 
 def test_register(client, app):
     print("Calling test_register...")
