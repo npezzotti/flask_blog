@@ -32,19 +32,13 @@ def create_app(test_config=None):
         app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
 
     db.init_app(app)
-    print(dir(db))
-
-    from . import db_utils
-    db_utils.init_app(app)
 
     from flask_blog.cli import init_db_command
     app.cli.add_command(init_db_command)
 
-    from flask_blog.auth.views import bp as auth_bp
-    app.register_blueprint(auth_bp)
-
-    from flask_blog.blog.views import bp as blog_bp
-    app.register_blueprint(blog_bp)
+    from flask_blog import auth, blog
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(blog.bp)
     app.add_url_rule('/', endpoint='index')
 
     return app

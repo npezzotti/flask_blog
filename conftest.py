@@ -2,8 +2,8 @@ import os
 import datetime
 import pytest
 from flask_blog import create_app, db
-from flask_blog.auth.models import User
 from flask_blog.blog.models import Post
+from flask_blog.auth.models import User
 
 @pytest.fixture
 def app():
