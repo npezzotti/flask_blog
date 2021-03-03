@@ -2,7 +2,7 @@ from flask import (
         Blueprint, flash, g, redirect, render_template, request, url_for
         )
 from werkzeug.exceptions import abort
-from flask_blog.auth.views import login_required
+from flask_blog.auth.utils import login_required
 from flask_blog.blog.models import Post
 from flask_blog import db
 
