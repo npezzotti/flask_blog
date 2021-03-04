@@ -8,9 +8,7 @@ from flask_blog.auth.models import User
 @pytest.fixture
 def app():
     print("\nCalling app fixture...\n")
-    app = create_app({
-        'TESTING': True,
-    })
+    app = create_app(testing=True)
 
     with app.app_context():
         db.drop_all()

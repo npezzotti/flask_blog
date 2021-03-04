@@ -29,6 +29,7 @@ def register():
         if error is None:
             db.session.add(User(username=username, password=password))
             db.session.commit()
+            flash(f"Account for {username} successfully created!")
             return redirect(url_for('auth.login'))
         flash(error)
 
